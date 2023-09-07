@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(uuid())
+  username        String
+  profile_picture String?
+  email           String        @unique
+  phone_number    String
+  password        String
+  reviews         Review[]
+  likes           ProductLike[]
+  shipping        Shipping?
+  orders          Order[]
+}
+
+model Shipping {
+  id      String @id @default(uuid())
+  city    String
+  address String
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  issued_at DateTime @default(now())
+}
+
+model Product {
+  id            String        @id @default(uuid())
+  name          String        @unique
+  description   String
+  price         Float
+  stock         Int
+  category_id   String
+  images        Image[]
+  category      Category      @relation(fields: [category_id], references: [id])
+  variants      Variant[]
+  discount      Discount?
+  parameters    Parameter[]
+  reviews       Review[]
+  likes         ProductLike[]
+  orders        Order[]
+  cart_elements CartElement[]
+
+  @@index([name], name: "product_name")
+  @@index([price], name: "product_price")
+}
+
+model Variant {
+  id         String  @id @default(uuid())
+  name       String
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model Discount {
+  id         String   @id @default(uuid())
+  percentage Int
+  expires_at DateTime
+  product_id String   @unique
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model Parameter {
+  id         String  @id @default(uuid())
+  key        String
+  value      String
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id           String  @id @default(uuid())
+  url          String
+  is_thumbnail Boolean
+  product_id   String
+  product      Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  rate       Int
+  content    String
+  likes      Int
+  dislikes   Int
+  created_at DateTime @default(now())
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model ProductLike {
+  id         String  @id @default(uuid())
+  user_id    String
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  image    String
+  products Product[]
+
+  @@index([name], name: "category_name")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  content   String
+  processed Boolean  @default(false)
+  sent_at   DateTime @default(now())
+}
+
+model OrderReport {
+  id        String   @id @default(uuid())
+  subject   String
+  content   String
+  processed Boolean  @default(false)
+  order_id  String   @unique
+  order     Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  sent_at   DateTime @default(now())
+}
+
+model Order {
+  id            String         @id @default(uuid())
+  user_id       String
+  user          User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  report        OrderReport?
+  product_id    String
+  product       Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  sold_at_price Float
+  quantity      Int
+  status        String
+  bought_at     DateTime       @default(now())
+  ReturnRequest ReturnRequest?
+}
+
+model ReturnRequest {
+  id        String   @id @default(uuid())
+  order_id  String   @unique
+  order     Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  reason    String
+  details   String?
+  processed Boolean  @default(false)
+  sent_at   DateTime @default(now())
+}
+
+model DiscountCoupon {
+  id         String  @id @default(uuid())
+  code       String  @unique
+  percentage Int
+  is_valid   Boolean @default(true)
+
+  @@index([code], name: "discount_coupon_code")
+}
+
+model CartElement {
+  id         String   @id @default(uuid())
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  quantity   Int
+  added_at   DateTime @default(now())
+}
+
+model NewsletterMember {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  created_at DateTime @default(now())
+}
