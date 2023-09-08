@@ -13,7 +13,10 @@
   --font: 'Comfortaa', cursive;
 
   /* colors */
-
+  --primary: #DAA520;
+  --primary-hover: #C99410;
+  --secondary: #36B7D9;
+  --secondary-hover: #25A6C8;
 
   /* transition */
   --transition: all 250ms ease;

@@ -21,6 +21,8 @@ model User {
   likes           ProductLike[]
   shipping        Shipping?
   orders          Order[]
+  cart_elements CartElement[]
+  created_at DateTime @default(now())
 }
 
 model Shipping {
@@ -174,6 +176,8 @@ model DiscountCoupon {
 
 model CartElement {
   id         String   @id @default(uuid())
+  user_id String
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   product_id String
   product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   quantity   Int

@@ -1,10 +1,12 @@
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <>
-      app
-    </>
+    <BrowserRouter>
+      <Routes>
+    
+      </Routes>
+    </BrowserRouter>
   );
 }
 

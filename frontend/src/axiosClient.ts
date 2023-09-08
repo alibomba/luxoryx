@@ -15,7 +15,34 @@ axiosClient.interceptors.request.use(
         return config;
     },
     error => Promise.reject(error)
-)
+);
+
+axiosClient.interceptors.response.use(
+    response => response,
+    (error) => {
+        const originalRequest = error.config;
+        if (error?.response?.status === 401 && error?.response?.data?.message === 'jwt expired') {
+            return axiosClient({
+                method: 'post',
+                url: '/refresh',
+                data: {
+                    refreshToken: localStorage.getItem('refreshToken') || ''
+                }
+            })
+                .then(res => {
+                    const { accessToken } = res.data;
+                    localStorage.setItem('accessToken', accessToken);
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+
+                    return axiosClient(originalRequest);
+                })
+                .catch(err => {
+                    return Promise.reject(err);
+                })
+        }
+        return Promise.reject(error);
+    }
+);
 
 
 export default axiosClient;
