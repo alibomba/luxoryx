@@ -1,5 +1,5 @@
 
-import { Hero, OffersSection, HomeTestimonials } from '../../sections';
+import { Hero, OffersSection, HomeTestimonials, HomeSecurity, Suppliers, Footer } from '../../sections';
 import styles from './home.module.css';
 
 const Home = () => {
@@ -18,6 +18,8 @@ const Home = () => {
                     offersCondition='limited'
                 />
                 <HomeTestimonials />
+                <HomeSecurity />
+                <Suppliers />
             </main>
         </>
     )
