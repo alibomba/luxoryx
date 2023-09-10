@@ -57,6 +57,9 @@ const Header = () => {
                     <Link className={styles.header__navLink} to='/o-firmie'>O firmie</Link>
                     <Link className={styles.header__navLink} to='/kontakt'>Kontakt</Link>
                     {
+                        !isAuthorized && <Link className={styles.header__navLink} to='/logowanie'>Zaloguj się</Link>
+                    }
+                    {
                         isAuthorized && <Link className={styles.header__navLink} to='/konto'>Konto</Link>
                     }
                     <Link className={styles.bottom__button} to='/koszyk'>
@@ -84,6 +87,9 @@ const Header = () => {
                     <button onClick={() => setIsNavActive(false)} className={styles.header__navLink}>Kategorie</button>
                     <Link onClick={() => setIsNavActive(false)} className={styles.header__navLink} to='/o-firmie'>O firmie</Link>
                     <Link onClick={() => setIsNavActive(false)} className={styles.header__navLink} to='/kontakt'>Kontakt</Link>
+                    {
+                        !isAuthorized && <Link onClick={() => setIsNavActive(false)} className={styles.header__navLink} to='/logowanie'>Zaloguj się</Link>
+                    }
                     {
                         isAuthorized && <Link onClick={() => setIsNavActive(false)} className={styles.header__navLink} to='/konto'>Konto</Link>
                     }
