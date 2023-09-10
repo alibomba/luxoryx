@@ -1,5 +1,5 @@
 
-import { Hero, HomeOffersSection } from '../../sections';
+import { Hero, OffersSection, HomeTestimonials } from '../../sections';
 import styles from './home.module.css';
 
 const Home = () => {
@@ -7,16 +7,17 @@ const Home = () => {
         <>
             <Hero />
             <main>
-                <HomeOffersSection
+                <OffersSection
                     heading='Na przecenie'
                     buttonContent='Zobacz więcej'
                     offersCondition='discount'
                 />
-                <HomeOffersSection
+                <OffersSection
                     heading='Ograniczony zasób'
                     buttonContent='Przejdź do sklepu'
                     offersCondition='limited'
                 />
+                <HomeTestimonials />
             </main>
         </>
     )
