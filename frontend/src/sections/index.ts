@@ -5,3 +5,4 @@ export { default as HomeTestimonials } from './homeTestimonials/HomeTestimonials
 export { default as HomeSecurity } from './homeSecurity/HomeSecurity';
 export { default as Suppliers } from './suppliers/Suppliers';
 export { default as Footer } from './footer/Footer';
+export { default as SklepCategories } from './sklepCategories/SklepCategories';

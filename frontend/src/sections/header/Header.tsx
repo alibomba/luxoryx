@@ -2,18 +2,44 @@ import { BsFillSendFill, BsSearch, BsInstagram, BsTwitter, BsFillCartFill } from
 import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import { IoLogOut } from 'react-icons/io5';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { AuthContext, ContextType } from '../../contexts/AuthProvider';
+import Error from '../../components/error/Error';
 
 import styles from './header.module.css';
+import axiosClient from '../../axiosClient';
 
 const Header = () => {
-    const { isAuthorized } = useContext<ContextType>(AuthContext);
+    const navigate = useNavigate();
+    const { isAuthorized, setIsAuthorized } = useContext<ContextType>(AuthContext);
     const [isNavActive, setIsNavActive] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     function toggleNav(): void {
         setIsNavActive(prev => !prev);
+    }
+
+    async function logout(): Promise<void> {
+        try {
+            const res = await axiosClient({
+                method: 'delete',
+                url: '/logout',
+                data: {
+                    refreshToken: localStorage.getItem('refreshToken') || ''
+                }
+            });
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            setIsAuthorized(false);
+            navigate('/logowanie');
+        } catch (err) {
+            setError('Coś poszło nie tak, spróbuj ponownie później...');
+        }
+    }
+
+    if (error) {
+        return <Error>{error}</Error>
     }
 
     return (
@@ -67,7 +93,7 @@ const Header = () => {
                     </Link>
                     {
                         isAuthorized &&
-                        <button className={styles.bottom__button}>
+                        <button onClick={logout} className={styles.bottom__button}>
                             <IoLogOut />
                         </button>
                     }
@@ -98,7 +124,7 @@ const Header = () => {
                     </Link>
                     {
                         isAuthorized &&
-                        <button onClick={() => setIsNavActive(false)} className={styles.bottom__button}>
+                        <button onClick={() => { setIsNavActive(false); logout(); }} className={styles.bottom__button}>
                             <IoLogOut />
                         </button>
                     }

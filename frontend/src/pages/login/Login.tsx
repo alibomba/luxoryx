@@ -139,7 +139,7 @@ const Login = () => {
                             <button className={styles.form__button}>Zaloguj się</button>
                         </div>
                         <Link className={styles.form__link} to='/rejestracja'>Załóż konto</Link>
-                        <Link className={styles.form__link} to='/'>Kontynuuj bez konta</Link>
+                        <Link className={styles.form__link} to='/'>Strona główna</Link>
                     </form>
                 </main>}
         </>

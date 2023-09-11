@@ -3,6 +3,7 @@ import cors from 'cors';
 require('dotenv').config();
 import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 
 const app: Application = express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use('/storage', express.static(`${__dirname}/public`));
 app.use('/api', userRoutes);
 app.use('/api', authRoutes);
+app.use('/api', categoryRoutes);
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
