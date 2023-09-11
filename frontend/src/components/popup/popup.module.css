@@ -14,3 +14,10 @@
 .popup_active {
     transform: translateX(0);
 }
+
+@media(max-width:500px) {
+    .popup {
+        right: .25em;
+        top: .25em;
+    }
+}

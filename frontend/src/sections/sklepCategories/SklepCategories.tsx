@@ -53,15 +53,6 @@ const SklepCategories = () => {
                         )
                     })
                 }
-
-                <Link className={styles.category} to='/wyszukiwarka?kategoria=kolczyki'>
-                    <img className={styles.category__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/categories/earrings.png`} alt="kolczyki" />
-                    <p className={styles.category__name}>Kolczyki</p>
-                </Link>
-                <Link className={styles.category} to='/wyszukiwarka?kategoria=bransolety'>
-                    <img className={styles.category__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/categories/bracelet.png`} alt="bransoleta" />
-                    <p className={styles.category__name}>Bransolety</p>
-                </Link>
             </div>
         </section>
     )
