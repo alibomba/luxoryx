@@ -46,7 +46,7 @@ const SklepCategories = () => {
                     categories.length > 0 &&
                     categories.map(category => {
                         return (
-                            <Link key={category.id} className={styles.category} to={`/wyszukiwarka?kategoria=${category.name}`}>
+                            <Link key={category.id} className={styles.category} to={`/wyszukiwarka?category=${category.name}`}>
                                 <img className={styles.category__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/categories/${category.image}`} alt="obraz kategorii" />
                                 <p className={styles.category__name}>{category.name}</p>
                             </Link>

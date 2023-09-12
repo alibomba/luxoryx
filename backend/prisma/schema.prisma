@@ -93,11 +93,11 @@ model Image {
 
 model Review {
   id         String   @id @default(uuid())
-  user_id    String
+  user_id    String 
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  rate       Int
-  content    String
-  likes      Int
+  rate       Int 
+  content    String 
+  likes      Int  
   dislikes   Int
   created_at DateTime @default(now())
   product_id String

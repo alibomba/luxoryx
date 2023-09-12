@@ -7,7 +7,7 @@ const ProductTile = () => {
     return (
         <article className={styles.product}>
             <Link to='/produkt/1'>
-                <img className={styles.product__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/offer1.jpg`} alt="miniatura produktu" />
+                <img className={styles.product__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="miniatura produktu" />
             </Link>
             <div className={styles.product__data}>
                 <h3 className={styles.product__title}><Link style={{ color: 'inherit', textDecoration: 'none' }} to='/produkt/1'>Nazwa produktu fajna bardzo taka ze dluga</Link></h3>

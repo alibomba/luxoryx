@@ -2,6 +2,8 @@ import categorySeeder from "./categorySeeder";
 import productSeeder from "./productSeeder";
 import userSeeder from "./userSeeder";
 import imageSeeder from "./imageSeeder";
+import parameterSeeder from "./parameterSeeder";
+import variantSeeder from "./variantSeeder";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -31,6 +33,8 @@ async function main() {
     await categorySeeder();
     await productSeeder(300);
     await imageSeeder();
+    await parameterSeeder();
+    await variantSeeder();
     await userSeeder();
 }
 

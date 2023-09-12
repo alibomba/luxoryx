@@ -5,6 +5,7 @@ import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import newsletterRoutes from './routes/newsletterRoutes';
+import productRoutes from './routes/productRoutes';
 
 const app: Application = express();
 
@@ -16,6 +17,7 @@ app.use('/api', userRoutes);
 app.use('/api', authRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', newsletterRoutes);
+app.use('/api', productRoutes);
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

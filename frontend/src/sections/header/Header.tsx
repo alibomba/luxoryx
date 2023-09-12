@@ -61,7 +61,7 @@ const Header = () => {
         const form = e.target as HTMLFormElement;
         const phrase = form.querySelector('input') as HTMLInputElement;
         if (phrase.value) {
-            navigate(`/wyszukiwarka?fraza=${phrase.value}`);
+            navigate(`/wyszukiwarka?name=${phrase.value}`);
         }
     }
 
@@ -216,7 +216,7 @@ const Header = () => {
                 <div className={styles.categories}>
                     {
                         categories.length > 0 && categories.map(category => {
-                            return <Link onClick={() => setIsCategoriesModalActive(false)} to={`/wyszukiwarka?kategoria=${category.name}`} key={category.id} className={styles.categories__link}>{category.name}</Link>
+                            return <Link onClick={() => setIsCategoriesModalActive(false)} to={`/wyszukiwarka?category=${category.name}`} key={category.id} className={styles.categories__link}>{category.name}</Link>
                         })
                     }
                 </div>
