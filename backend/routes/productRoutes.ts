@@ -91,4 +91,39 @@ productRoutes.get('/products-search', async(req: Request, res: Response) => {
     res.json(response);
 });
 
+productRoutes.get('/products-discount', async (req: Request, res: Response) => {
+    const products = await prisma.product.findMany({
+        where: {discount: {
+            isNot: null
+        }},
+        include: {discount: true},
+        take: 6
+    });
+    if(products.length < 6) return res.status(404).json({message: 'Za mało wyników'});
+    res.json(products);
+});
+
+productRoutes.get('/products-limited', async(req: Request, res: Response) => {
+    const products = await prisma.product.findMany({
+        where: {stock: {lte: 30}},
+        orderBy: {stock: 'asc'},
+        take: 6
+    });
+
+    if(products.length < 6) return res.status(404).json({message: 'Za mało wyników'});
+    res.json(products);
+});
+
+productRoutes.get('/products-popular', async(req: Request, res: Response) => {
+    const products = await prisma.product.findMany({include: {orders: true}, orderBy: {orders: {
+        _count: 'desc'
+    }}});
+    res.json(products);
+});
+
+productRoutes.get('/products-new', async(req: Request, res: Response) => {
+    const products = await prisma.product.findMany({select: {created_at: true}});
+    res.json(products);
+});
+
 export default productRoutes;

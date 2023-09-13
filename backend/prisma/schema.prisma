@@ -41,7 +41,7 @@ model RefreshToken {
 
 model Product {
   id            String        @id @default(uuid())
-  name          String
+  name          String        @db.VarChar(40)
   description   String
   price         Float
   stock         Int
@@ -55,6 +55,7 @@ model Product {
   likes         ProductLike[]
   orders        Order[]
   cart_elements CartElement[]
+  created_at DateTime @default(now())
 
   @@index([name], name: "product_name")
   @@index([price], name: "product_price")
