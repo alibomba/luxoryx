@@ -1,1 +1,0 @@
--naprawic sortowanie po cenie uwzgledniajac discounty

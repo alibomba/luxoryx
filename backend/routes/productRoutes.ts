@@ -94,7 +94,9 @@ productRoutes.get('/products-search', async (req: Request, res: Response) => {
 productRoutes.get('/products-discount', async (req: Request, res: Response) => {
     const products = await prisma.product.findMany({
         where: {
-            discount: { isNot: null }
+            discount: {
+                expires_at: { gt: new Date() }
+            }
         },
         include: { discount: true, images: { where: { is_thumbnail: true } } },
         take: 6

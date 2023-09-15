@@ -13,7 +13,7 @@ async function discountSeeder() {
 
     await prisma.discount.createMany({
         data: [
-            { percentage: Math.round(Math.random() * (85 - 20 + 1)) + 20, expires_at: "2023-09-14T15:12:00.000Z", product_id: getRandomElementFromArray(productIds).id },
+            { percentage: Math.round(Math.random() * (85 - 20 + 1)) + 20, expires_at: "2023-09-20T10:00:00.000Z", product_id: getRandomElementFromArray(productIds).id },
             { percentage: Math.round(Math.random() * (85 - 20 + 1)) + 20, expires_at: "2023-09-20T10:00:00.000Z", product_id: getRandomElementFromArray(productIds).id },
             { percentage: Math.round(Math.random() * (85 - 20 + 1)) + 20, expires_at: "2023-09-20T10:00:00.000Z", product_id: getRandomElementFromArray(productIds).id },
             { percentage: Math.round(Math.random() * (85 - 20 + 1)) + 20, expires_at: "2023-09-20T10:00:00.000Z", product_id: getRandomElementFromArray(productIds).id },

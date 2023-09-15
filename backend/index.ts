@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import newsletterRoutes from './routes/newsletterRoutes';
 import productRoutes from './routes/productRoutes';
+import likeRoutes from './routes/likeRoutes';
+import cartRoutes from './routes/cartRoutes';
 
 const app: Application = express();
 
@@ -18,6 +20,8 @@ app.use('/api', authRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', newsletterRoutes);
 app.use('/api', productRoutes);
+app.use('/api', likeRoutes);
+app.use('/api', cartRoutes);
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

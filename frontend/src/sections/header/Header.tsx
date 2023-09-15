@@ -12,12 +12,6 @@ import axiosClient from '../../axiosClient';
 import axios from 'axios';
 import Popup from '../../components/popup/Popup';
 
-interface Popup {
-    content: string | null;
-    type: 'good' | 'bad';
-    active: boolean;
-}
-
 interface Category {
     id: string;
     name: string;

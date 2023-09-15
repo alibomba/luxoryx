@@ -62,6 +62,18 @@ const Login = () => {
             localStorage.setItem('refreshToken', res.data.refreshToken);
             setIsAuthorized(true);
             navigate('/');
+            if (localStorage.getItem('cart')) {
+                const cart = JSON.parse(localStorage.getItem('cart')!) as LocalCartElement[];
+                if (cart.length > 0) {
+                    cart.forEach(async (cartElement) => {
+                        try {
+                            await axiosClient({ method: 'post', url: `/add-to-cart/${cartElement.product_id}`, data: { quantity: cartElement.quantity } });
+                        } catch (err) {
+                            setError('Coś poszło nie tak, spróbuj ponownie później...');
+                        }
+                    });
+                }
+            }
         } catch (err: any) {
             if (err?.response?.status === 401) {
                 setLoginError(err?.response?.data?.message);
