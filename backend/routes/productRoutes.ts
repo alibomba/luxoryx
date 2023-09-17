@@ -14,7 +14,7 @@ productRoutes.get('/products', async (req: Request, res: Response) => {
     const lastPage = Math.ceil(productCount / PER_PAGE);
     if (page > lastPage) return res.status(404).json({ message: `There are only ${lastPage} pages` });
     const offset = (page - 1) * PER_PAGE;
-    const products = await prisma.product.findMany({ take: PER_PAGE, skip: offset, include: { discount: true } });
+    const products = await prisma.product.findMany({ take: PER_PAGE, skip: offset, include: { discount: true, images: { where: { is_thumbnail: true } } } });
     const response: PaginationResponse<Product> = {
         currentPage: page,
         lastPage,
@@ -61,6 +61,10 @@ productRoutes.get('/products-search', async (req: Request, res: Response) => {
 
     if (sortExpensive) {
         order.price = 'desc';
+    }
+
+    if (!sortCheap && !sortExpensive) {
+        order.created_at = 'desc';
     }
 
     const productCount = (await prisma.product.findMany({ where: query })).length;

@@ -68,8 +68,10 @@ const Login = () => {
                     cart.forEach(async (cartElement) => {
                         try {
                             await axiosClient({ method: 'post', url: `/add-to-cart/${cartElement.product_id}`, data: { quantity: cartElement.quantity } });
-                        } catch (err) {
-                            setError('Coś poszło nie tak, spróbuj ponownie później...');
+                        } catch (err: any) {
+                            if (err?.response?.status !== 422) {
+                                setError('Coś poszło nie tak, spróbuj ponownie później...');
+                            }
                         }
                     });
                 }
