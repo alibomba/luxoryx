@@ -1,0 +1,63 @@
+.googleMaps {
+    width: 100%;
+    border-block: 3px solid var(--secondary);
+}
+
+.form {
+    margin-top: 7em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+    padding: 2em;
+}
+
+.form__heading {
+    font-size: 3rem;
+    text-align: center;
+}
+
+.form__row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3em;
+    flex-wrap: wrap;
+}
+
+.form__input,
+.form__textarea {
+    border: 3px solid var(--secondary);
+    padding: .4em;
+    box-shadow: 5px 5px 5px 0px var(--secondary);
+    font-size: 1.75rem;
+}
+
+.form__input {
+    border-radius: 150px;
+}
+
+.form__textarea {
+    border-radius: 20px;
+}
+
+.form__button {
+    font-size: 2rem;
+    padding: .3em 1em;
+    color: white;
+    background-color: var(--primary);
+    font-weight: bold;
+    border: none;
+    border-radius: 150px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.form__button:hover,
+.form__button:focus {
+    background-color: var(--primary-hover);
+}
+
+.contact {
+    margin-top: 5em;
+}
