@@ -64,7 +64,7 @@ productRoutes.get('/products-search', async (req: Request, res: Response) => {
     }
 
     if (!sortCheap && !sortExpensive) {
-        order.created_at = 'desc';
+        order.createdAt = 'desc';
     }
 
     const productCount = (await prisma.product.findMany({ where: query })).length;
@@ -134,7 +134,7 @@ productRoutes.get('/products-popular', async (req: Request, res: Response) => {
 });
 
 productRoutes.get('/products-new', async (req: Request, res: Response) => {
-    const products = await prisma.product.findMany({ include: { discount: true, images: { where: { is_thumbnail: true } } }, orderBy: { created_at: 'desc' }, take: 6 });
+    const products = await prisma.product.findMany({ include: { discount: true, images: { where: { is_thumbnail: true } } }, orderBy: { createdAt: 'desc' }, take: 6 });
     res.json(products);
 });
 
