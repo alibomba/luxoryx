@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import multer from 'multer';
 require('dotenv').config();
 import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';
@@ -8,6 +9,7 @@ import newsletterRoutes from './routes/newsletterRoutes';
 import productRoutes from './routes/productRoutes';
 import likeRoutes from './routes/likeRoutes';
 import cartRoutes from './routes/cartRoutes';
+import contactRoutes from './routes/contactRoutes';
 
 const app: Application = express();
 
@@ -22,6 +24,7 @@ app.use('/api', newsletterRoutes);
 app.use('/api', productRoutes);
 app.use('/api', likeRoutes);
 app.use('/api', cartRoutes);
+app.use('/api', contactRoutes);
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

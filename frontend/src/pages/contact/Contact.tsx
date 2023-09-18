@@ -1,18 +1,62 @@
-
+import { useState } from 'react';
+import axiosClient from '../../axiosClient';
 import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import styles from './contact.module.css';
+import Error from '../../components/error/Error';
+import Popup from '../../components/popup/Popup';
 
 const Contact = () => {
+    const [error, setError] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<string | null>(null);
+    const [popup, setPopup] = useState<string | null>(null);
+
+    async function sendMessage(e: React.FormEvent): Promise<void> {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const name = form.querySelector('#name') as HTMLInputElement;
+        const email = form.querySelector('#email') as HTMLInputElement;
+        const subject = form.querySelector('#subject') as HTMLSelectElement;
+        const content = form.querySelector('#message') as HTMLTextAreaElement;
+
+        try {
+            const res = await axiosClient({
+                method: 'post',
+                url: '/contact',
+                data: {
+                    name: name.value,
+                    email: email.value,
+                    subject: subject.value,
+                    content: content.value
+                }
+            });
+            setValidationError(null);
+            setPopup('Wysłano wiadomość');
+            setTimeout(() => setPopup(null), 4000);
+            form.reset();
+        } catch (err: any) {
+            if (err?.response?.status === 422) {
+                setValidationError(err?.response?.data?.message);
+            }
+            else {
+                setError('Coś poszło nie tak, spróbuj ponownie później...');
+            }
+        }
+    }
+
+    if (error) {
+        return <Error>{error}</Error>
+    }
+
     return (
         <main className={styles.main}>
             <iframe className={styles.googleMaps} src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5938.626393502821!2d20.98331760104854!3d52.22170220505122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ecc871c4decbf%3A0x76b3a7b992d747df!2sBia%C5%82a%2027%2C%2000-895%20Warszawa!5e1!3m2!1spl!2spl!4v1694952156447!5m2!1spl!2spl" width="600" height="450" loading="lazy"></iframe>
-            <form className={styles.form}>
+            <form onSubmit={sendMessage} className={styles.form}>
                 <h2 className={styles.form__heading}>Wyślij wiadomość</h2>
                 <div className={styles.form__row}>
-                    <input id='name' className={styles.form__input} placeholder='Imię' aria-label='Imię' type="text" />
-                    <input id='email' className={styles.form__input} placeholder='E-mail' aria-label='E-mail' type="email" />
+                    <input required id='name' className={styles.form__input} placeholder='Imię' aria-label='Imię' type="text" />
+                    <input required id='email' className={styles.form__input} placeholder='E-mail' aria-label='E-mail' type="email" />
                 </div>
-                <select className={styles.form__input} aria-label='Temat' id="subject">
+                <select required className={styles.form__input} aria-label='Temat' id="subject">
                     <option value="">Temat</option>
                     <option value="Zapytanie o produkt">Zapytanie o produkt</option>
                     <option value="Status zamówienia">Status zamówienia</option>
@@ -27,8 +71,12 @@ const Contact = () => {
                     <option value="Media i Prasa">Media i Prasa</option>
                     <option value="Inne">Inne</option>
                 </select>
-                <textarea id="message" placeholder='Treść' aria-label='Treść' className={styles.form__textarea} cols={30} rows={10}></textarea>
+                <textarea maxLength={1000} id="message" placeholder='Treść' aria-label='Treść' className={styles.form__textarea} cols={30} rows={10}></textarea>
+                {
+                    validationError && <p role='alert' aria-live='assertive' className={styles.form__error}>{validationError}</p>
+                }
                 <button className={styles.form__button}>Wyślij</button>
+                <Popup type='good' active={popup ? true : false}>{popup}</Popup>
             </form>
             <section className={styles.contact}>
                 <h2 className={styles.contact__heading}>Skontaktuj się z nami</h2>

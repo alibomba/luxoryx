@@ -49,7 +49,10 @@ productRoutes.get('/products-search', async (req: Request, res: Response) => {
 
     if (category) {
         query.category = {
-            name: category as string
+            name: {
+                equals: category as string,
+                mode: 'insensitive'
+            }
         }
     }
 

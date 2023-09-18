@@ -44,6 +44,7 @@ const Wyszukiwarka = () => {
     useEffect(() => {
         const source = axios.CancelToken.source();
         const urlTemp = new URL(url);
+        console.log(urlTemp.toString());
 
         axiosClient({
             method: 'get',
