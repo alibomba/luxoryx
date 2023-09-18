@@ -1,6 +1,5 @@
 import express, { Application } from 'express';
 import cors from 'cors';
-import multer from 'multer';
 require('dotenv').config();
 import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';

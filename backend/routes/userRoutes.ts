@@ -2,6 +2,9 @@ import { Request, Response, Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwtAuthentication from '../middleware/jwtAuthentication';
+import multer from 'multer';
+import { v4 } from 'uuid';
+import path from 'path';
 
 const userRoutes: Router = Router();
 const prisma = new PrismaClient();
@@ -36,8 +39,44 @@ userRoutes.post('/register', async (req: Request, res: Response) => {
     }
 });
 
-userRoutes.put('/edit-profile', jwtAuthentication, async (req: Request, res: Response) => {
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, `${__dirname}/../public/pfp`);
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${v4()}${path.extname(file.originalname)}`)
+    }
+})
+
+const upload = multer({
+    storage, fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = ['image/jpeg', 'image/png'];
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, false);
+            return cb(new Error('Plik musi być obrazem', { cause: 'validation' }));
+        } else {
+            cb(null, true);
+        }
+    },
+    limits: {
+        fileSize: 4 * 1024 * 1024
+    }
+}).single('image');
+
+userRoutes.put('/upload-file', async (req: Request, res: Response) => {
+    upload(req, res, (err) => {
+        if (err && err.cause === 'validation') {
+            return res.status(422).json({ message: err.message });
+        }
+        else if (err && err instanceof multer.MulterError && err.message === 'File too large') {
+            return res.status(422).json({ message: 'Plik może mieć maksymalnie 4MB' });
+        }
+        else if (err) {
+            return res.sendStatus(500);
+        }
+        res.json({ message: 'File uploaded' });
+    });
 });
 
 
