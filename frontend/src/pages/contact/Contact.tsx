@@ -71,7 +71,7 @@ const Contact = () => {
                     <option value="Media i Prasa">Media i Prasa</option>
                     <option value="Inne">Inne</option>
                 </select>
-                <textarea maxLength={1000} id="message" placeholder='Treść' aria-label='Treść' className={styles.form__textarea} cols={30} rows={10}></textarea>
+                <textarea required maxLength={1000} id="message" placeholder='Treść' aria-label='Treść' className={styles.form__textarea} cols={30} rows={10}></textarea>
                 {
                     validationError && <p role='alert' aria-live='assertive' className={styles.form__error}>{validationError}</p>
                 }

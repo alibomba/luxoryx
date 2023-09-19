@@ -2,9 +2,8 @@ import { Request, Response, Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwtAuthentication from '../middleware/jwtAuthentication';
-import multer from 'multer';
-import { v4 } from 'uuid';
-import path from 'path';
+import upload from '../middleware/pfpUpload';
+import { MulterError } from 'multer';
 
 const userRoutes: Router = Router();
 const prisma = new PrismaClient();
@@ -40,43 +39,108 @@ userRoutes.post('/register', async (req: Request, res: Response) => {
 });
 
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, `${__dirname}/../public/pfp`);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${v4()}${path.extname(file.originalname)}`)
-    }
-})
 
-const upload = multer({
-    storage, fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = ['image/jpeg', 'image/png'];
-        if (!allowedMimeTypes.includes(file.mimetype)) {
-            cb(null, false);
-            return cb(new Error('Plik musi być obrazem', { cause: 'validation' }));
-        } else {
-            cb(null, true);
+userRoutes.put('/update-user', jwtAuthentication,async (req: Request, res: Response) => {
+    const {user} = req.body;
+    upload(req, res, async err => {
+        if(err){
+            if(err instanceof MulterError){
+                if(err.code === 'LIMIT_UNEXPECTED_FILE'){
+                    return res.status(422).json({message: 'Plik musi być obrazem'});
+                }
+                if(err.code === 'LIMIT_FILE_SIZE'){
+                    return res.status(422).json({message: 'Plik może mieć maksymalnie 2MB'});
+                }
+            }
+            else{
+                return res.sendStatus(500);
+            }
         }
-    },
-    limits: {
-        fileSize: 4 * 1024 * 1024
-    }
-}).single('image');
+        if(req.file){
+            try{
+                await prisma.user.update({where: {id: user.id}, data: {profile_picture: req.file.filename}});
+                return res.json({message: 'Zaktualizowano zdjęcie profilowe'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
+        }
 
-userRoutes.put('/upload-file', async (req: Request, res: Response) => {
-    upload(req, res, (err) => {
-        if (err && err.cause === 'validation') {
-            return res.status(422).json({ message: err.message });
+        const {username, city, address, email, phoneNumber, password} = req.body;
+         if(username || city || address || email || phoneNumber || password){
+        if(username){
+            if(username.length > 30) return res.status(422).json({message: 'Nazwa użytkownika może mieć maksymalnie'});
+            try{
+                await prisma.user.update({where: {id: user.id}, data: {username}});
+                return res.json({message: 'Zaktualizowano nazwę użytkownika'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
         }
-        else if (err && err instanceof multer.MulterError && err.message === 'File too large') {
-            return res.status(422).json({ message: 'Plik może mieć maksymalnie 4MB' });
+        if(city){
+            if(city.length > 100) return res.status(422).json({message: 'Miasto może mieć maksymalnie 100 znaków'});
+            try{
+                await prisma.shipping.update({where: {user_id: user.id}, data: {city}});
+                return res.json({message: 'Zaktualizowano miasto dostawy'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
         }
-        else if (err) {
-            return res.sendStatus(500);
+        if(address){
+            if(address.length > 100) return res.status(422).json({message: 'Adres może mieć maksymalnie 100 znaków'});
+            try{
+                await prisma.shipping.update({where: {user_id: user.id}, data: {address}});
+                return res.json({message: 'Zaktualizowano adres dostawy'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
         }
-        res.json({ message: 'File uploaded' });
+        if(email){
+            if(email.length > 100) return res.status(422).json({message: 'Adres e-mail może mieć maksymalnie 100 znaków'});
+            const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+            if (!emailRegex.test(email)) return res.status(422).json({ message: 'Podaj poprawny adres e-mail' });
+            const userFound = await prisma.user.findUnique({where: {email}});
+            if(userFound && userFound.id !== user.id) return res.status(422).json({message: 'Podany adres e-mail jest już zajęty'});
+            try{
+                await prisma.user.update({where: {id: user.id}, data: {email}});
+                return res.json({message: 'Zaktualizowano adres e-mail'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
+        }
+        if(phoneNumber){
+            if(phoneNumber.length > 30) return res.status(422).json({message: 'Numer telefonu może mieć maksymalnie 30 znaków'});
+            try{
+                await prisma.user.update({where: {id: user.id}, data: {phone_number: phoneNumber}});
+                return res.json({message: 'Zaktualizowano numer telefonu'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
+        }
+        if(password){
+            if(password.length < 8) return res.status(422).json({message: 'Hasło musi mieć przynajmniej 8 znaków'});
+            if(password.length > 50) return res.status(422).json({message: 'Hasło może mieć maksymalnie 50 znaków'});
+            const passwordHash = await bcrypt.hash(password, 10);
+            try{
+                await prisma.user.update({where: {id: user.id}, data: {password: passwordHash}});
+                return res.json({message: 'Zaktualizowano hasło'});
+            }catch(err){
+                return res.sendStatus(500);
+            }
+        }
+    }else{
+        res.status(400).json({message: 'Brak danych do zaktualizowania'});
+    }  
     });
+});
+
+userRoutes.delete('/delete-pfp', jwtAuthentication, async(req: Request, res: Response) => {
+    const {user} = req.body;
+    try{
+        await prisma.user.update({where: {id: user.id}, data: {profile_picture: null}});
+        res.json({message: 'Usunięto zdjęcie profilowe'});
+    }catch(err){
+        res.sendStatus(500);
+    }
 });
 
 
