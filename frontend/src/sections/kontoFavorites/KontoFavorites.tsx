@@ -2,7 +2,11 @@
 
 import styles from './kontoFavorites.module.css';
 
-const KontoMyFavorites = () => {
+interface Props {
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+const KontoMyFavorites = ({ setError }: Props) => {
   return (
     <div>
       favorites
