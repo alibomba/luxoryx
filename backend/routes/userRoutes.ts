@@ -40,7 +40,7 @@ userRoutes.post('/register', async (req: Request, res: Response) => {
 
 
 
-userRoutes.put('/update-user', jwtAuthentication,async (req: Request, res: Response) => {
+userRoutes.put('/update-user', jwtAuthentication, async (req: Request, res: Response) => {
     const {user} = req.body;
     upload(req, res, async err => {
         if(err){
