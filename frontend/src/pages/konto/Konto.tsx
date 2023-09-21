@@ -60,15 +60,15 @@ const Konto = () => {
                     <TbLogout />
                 </button>
                 <nav className={styles.sidebar__nav}>
-                    <button onClick={() => setTab('settings')} className={styles.sidebar__navLink}>
+                    <button onClick={() => { setTab('settings'); setIsSidebarActive(false); }} className={styles.sidebar__navLink}>
                         <RiAccountCircleFill className={styles.navLink__icon} />
                         <span className={styles.navLink__text}>Konto</span>
                     </button>
-                    <button onClick={() => setTab('myOrders')} className={styles.sidebar__navLink}>
+                    <button onClick={() => { setTab('myOrders'); setIsSidebarActive(false); }} className={styles.sidebar__navLink}>
                         <BsFillCartFill className={styles.navLink__icon} />
                         <span className={styles.navLink__text}>Moje zamówienia</span>
                     </button>
-                    <button onClick={() => setTab('favorites')} className={styles.sidebar__navLink}>
+                    <button onClick={() => { setTab('favorites'); setIsSidebarActive(false); }} className={styles.sidebar__navLink}>
                         <AiFillHeart className={styles.navLink__icon} />
                         <span className={styles.navLink__text}>Ulubione</span>
                     </button>

@@ -66,7 +66,7 @@ userRoutes.put('/update-user', jwtAuthentication, async (req: Request, res: Resp
         if (req.file) {
             try {
                 await prisma.user.update({ where: { id: user.id }, data: { profile_picture: req.file.filename } });
-                return res.json({ message: 'Zaktualizowano zdjęcie profilowe' });
+                return res.json({ path: req.file.filename });
             } catch (err) {
                 return res.sendStatus(500);
             }

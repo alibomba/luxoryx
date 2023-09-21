@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { PrismaClient, Product } from '@prisma/client';
 import { PaginationResponse } from '../types';
+import jwtAuthentication from '../middleware/jwtAuthentication';
 const productRoutes: Router = Router();
 const prisma = new PrismaClient();
 
@@ -139,6 +140,12 @@ productRoutes.get('/products-popular', async (req: Request, res: Response) => {
 productRoutes.get('/products-new', async (req: Request, res: Response) => {
     const products = await prisma.product.findMany({ include: { discount: true, images: { where: { is_thumbnail: true } } }, orderBy: { createdAt: 'desc' }, take: 6 });
     res.json(products);
+});
+
+productRoutes.get('/my-favorites', jwtAuthentication, async (req: Request, res: Response) => {
+    const { user } = req.body;
+    const favorites = await prisma.productLike.findMany({ where: { user_id: user.id }, select: { product: true } });
+    res.json(favorites);
 });
 
 export default productRoutes;

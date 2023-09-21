@@ -1,0 +1,156 @@
+.main {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.5em;
+}
+
+.order {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    height: 170px;
+    padding: .5em;
+}
+
+.order__img {
+    width: 240px;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.order__data {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: .3em;
+}
+
+.order__title {
+    font-size: 2rem;
+}
+
+.order__quantity {
+    font-size: 1.8rem;
+    color: var(--black-65);
+}
+
+.order__price {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.order__button {
+    border: none;
+    background: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: .3em;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--black-65);
+    font-family: inherit;
+    font-weight: bold;
+}
+
+.order__icon {
+    font-size: 3.3rem;
+    color: var(--primary);
+}
+
+.order__button__text {
+    font-size: 1.7rem;
+    max-width: 20ch;
+    line-height: 1.5;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 3em;
+}
+
+.pagination__button {
+    font-size: 3rem;
+    display: grid;
+    place-items: center;
+    padding: .3em;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--secondary);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pagination__button_disabled {
+    cursor: not-allowed;
+    background-color: gray;
+}
+
+.pagination__button:not(.pagination__button_disabled):hover,
+.pagination__button:not(.pagination__button_disabled):focus {
+    background-color: var(--secondary-hover);
+}
+
+.pagination__numbers {
+    position: relative;
+    min-width: 6em;
+    height: 5em;
+}
+
+.pagination__number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.pagination__number_current {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+}
+
+.pagination__number_total {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+}
+
+.pagination__line {
+    width: 2px;
+    height: 100%;
+    background-color: var(--black);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    rotate: 45deg;
+}
+
+.noResults {
+    font-size: 3rem;
+    color: white;
+    background-color: rgba(255, 0, 0, .7);
+    width: fit-content;
+    margin: 0 auto;
+    text-align: center;
+    padding: 1em;
+    font-weight: bold;
+    border-radius: 30px;
+}
+
+@media(max-width:450px) {
+    .pagination__button {
+        font-size: 2.5rem;
+    }
+
+    .pagination__number {
+        font-size: 1.6rem;
+    }
+}
