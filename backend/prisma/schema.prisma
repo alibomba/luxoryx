@@ -22,6 +22,7 @@ model User {
   shipping        Shipping?
   orders          Order[]
   cart_elements   CartElement[]
+  orderReports    OrderReport[]
   created_at      DateTime      @default(now())
 }
 
@@ -55,7 +56,7 @@ model Product {
   likes         ProductLike[]
   orders        Order[]
   cart_elements CartElement[]
-  createdAt    DateTime      @default(now())
+  createdAt     DateTime      @default(now())
 
   @@index([name], name: "product_name")
   @@index([price], name: "product_price")
@@ -134,9 +135,11 @@ model ContactMessage {
 
 model OrderReport {
   id        String   @id @default(uuid())
-  subject   String
-  content   String
+  subject   String   @db.VarChar(100)
+  content   String   @db.Text
   processed Boolean  @default(false)
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   order_id  String   @unique
   order     Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
   sent_at   DateTime @default(now())
