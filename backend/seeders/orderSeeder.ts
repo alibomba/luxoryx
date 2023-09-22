@@ -22,6 +22,15 @@ async function orderSeeder(){
             {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
             {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
             {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
+            {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'},
             {user_id: getRandomElementFromArray(users).id, product_id: products[1].id, sold_at_price: 190, quantity: 7, status: 'completed'}
         ]
     })

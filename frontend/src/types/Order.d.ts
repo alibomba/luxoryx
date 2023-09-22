@@ -3,7 +3,7 @@ type Order = {
     user_id: string,
     product_id: string,
     sold_at_price: number,
-    quantity: string,
+    quantity: number,
     status: string,
     bought_at: string
 }
