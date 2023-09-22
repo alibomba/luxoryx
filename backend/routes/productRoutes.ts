@@ -1,7 +1,8 @@
 import { Request, Response, Router } from 'express';
-import { PrismaClient, Product } from '@prisma/client';
+import { PrismaClient, Product, ProductLike } from '@prisma/client';
 import { PaginationResponse } from '../types';
 import jwtAuthentication from '../middleware/jwtAuthentication';
+import Favorite from '../types/Favorite';
 const productRoutes: Router = Router();
 const prisma = new PrismaClient();
 
@@ -143,9 +144,32 @@ productRoutes.get('/products-new', async (req: Request, res: Response) => {
 });
 
 productRoutes.get('/my-favorites', jwtAuthentication, async (req: Request, res: Response) => {
+    const PER_PAGE: number = 6;
     const { user } = req.body;
-    const favorites = await prisma.productLike.findMany({ where: { user_id: user.id }, select: { product: true } });
-    res.json(favorites);
+    let page = req.query.page as string | number;
+    if (page) page = +page;
+    else page = 1;
+    const favoritesCount = (await prisma.productLike.findMany({ where: { user_id: user.id } })).length;
+    if (favoritesCount === 0) return res.status(404).json({ message: 'Brak ulubionych' });
+    const lastPage = Math.ceil(favoritesCount / PER_PAGE);
+    if (page > lastPage) return res.status(404).json({ message: `There are only ${lastPage} pages` });
+    const offset = (page - 1) * PER_PAGE;
+    const favorites = await prisma.productLike.findMany({
+        where: { user_id: user.id },
+        select: {
+            product: {
+                include: { discount: true, images: { where: { is_thumbnail: true } } }
+            }
+        },
+        take: PER_PAGE,
+        skip: offset
+    });
+    const response: PaginationResponse<Favorite> = {
+        currentPage: page,
+        lastPage,
+        data: favorites
+    };
+    res.json(response);
 });
 
 export default productRoutes;

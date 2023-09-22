@@ -11,7 +11,11 @@ import axiosClient from '../../axiosClient';
 import axios, { AxiosError } from 'axios';
 import Error from '../error/Error';
 
-const ProductTile = (product: ProductTile) => {
+interface Props extends ProductTile {
+    className?: string;
+}
+
+const ProductTile = (product: Props) => {
     const { isAuthorized } = useContext<ContextType>(AuthContext);
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [popup, setPopup] = useState<Popup>({ content: null, type: 'good', active: false });
@@ -96,7 +100,7 @@ const ProductTile = (product: ProductTile) => {
     }
 
     return (
-        <article className={styles.product}>
+        <article className={`${styles.product} ${product.className && product.className}`}>
             <Link to={`/produkt/${product.id}`}>
                 <img className={styles.product__img} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/${product.images[0].url}`} alt="miniatura produktu" />
             </Link>

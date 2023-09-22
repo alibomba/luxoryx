@@ -121,6 +121,7 @@
 
     .product__priceContainer {
         font-size: 1.3rem;
+        flex-direction: column;
     }
 
     .product__oldPrice {
@@ -141,5 +142,9 @@
 
     .product__likeButton {
         font-size: 4rem;
+    }
+
+    .product__stock {
+        font-size: 1.4rem;
     }
 }
