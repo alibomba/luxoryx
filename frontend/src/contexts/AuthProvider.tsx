@@ -6,12 +6,16 @@ export interface ContextType {
   isAuthorized: boolean;
   isLoading: boolean;
   setIsAuthorized: React.Dispatch<React.SetStateAction<boolean>>;
+  cart: UICartElement[];
+  setContextCart: React.Dispatch<React.SetStateAction<UICartElement[]>>;
 }
 
 const AuthContext = createContext<ContextType>({
   isAuthorized: false,
   isLoading: true,
-  setIsAuthorized: () => false
+  setIsAuthorized: () => false,
+  cart: [],
+  setContextCart: () => []
 });
 
 interface Props {
@@ -21,6 +25,7 @@ interface Props {
 const AuthProvider = ({ children }: Props) => {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [cart, setContextCart] = useState<UICartElement[]>([]);
 
   useEffect(() => {
     const source = axios.CancelToken.source();
@@ -49,7 +54,9 @@ const AuthProvider = ({ children }: Props) => {
   const initialValue: ContextType = {
     isAuthorized,
     isLoading,
-    setIsAuthorized
+    setIsAuthorized,
+    cart,
+    setContextCart
   };
 
   return (

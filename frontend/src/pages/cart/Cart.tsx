@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useRef } from 'react';
 import { ContextType, AuthContext } from '../../contexts/AuthProvider';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { BsTrash } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 import getCart from '../../utilities/getCart';
 import Loading from '../../components/loading/Loading';
 import Error from '../../components/error/Error';
@@ -13,8 +14,9 @@ import computeSummaryPriceCart from '../../utilities/computeSummaryPriceCart';
 import styles from './cart.module.css';
 
 const Cart = () => {
+    const navigate = useNavigate();
     const localCart = getCart();
-    const { isLoading, isAuthorized } = useContext<ContextType>(AuthContext);
+    const { isLoading, isAuthorized, setContextCart } = useContext<ContextType>(AuthContext);
     const [cart, setCart] = useState<UICartElement[]>([]);
     const [isCartLoading, setIsCartLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -305,6 +307,11 @@ const Cart = () => {
         select.value = '';
     }
 
+    function checkout(){
+        setContextCart(cart);
+        navigate('/dostawa-i-platnosc');
+    }
+
 
     if (error) {
         return <Error>{error}</Error>
@@ -365,7 +372,7 @@ const Cart = () => {
                             <p className={styles.summary__text}>Dostawa od</p>
                             <p className={styles.summary__text}>9.99zł</p>
                         </div>
-                        <button className={styles.summary__button}>Dostawa i płatność</button>
+                        <button onClick={checkout} className={styles.summary__button}>Dostawa i płatność</button>
                     </div>
                 </>
             }

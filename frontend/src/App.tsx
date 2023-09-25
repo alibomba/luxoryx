@@ -19,7 +19,7 @@ function App() {
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/konto" element={<Konto />} />
             <Route path="/koszyk" element={<Cart />} />
-            <Route path="/platnosc/:id" element={<Checkout />} />
+            <Route path="/dostawa-i-platnosc" element={<Checkout />} />
             <Route path="/produkt/:id" element={<Product />} />
             <Route path="/zwrot/:id" element={<ReturnPage />} />
           </Route>
