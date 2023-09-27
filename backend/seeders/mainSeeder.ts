@@ -6,6 +6,7 @@ import parameterSeeder from "./parameterSeeder";
 import variantSeeder from "./variantSeeder";
 import discountSeeder from "./discountSeeder";
 import orderSeeder from "./orderSeeder";
+import couponCodeSeeder from "./couponCodeSeeder";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -40,6 +41,7 @@ async function main() {
     await variantSeeder();
     await discountSeeder();
     await orderSeeder();
+    await couponCodeSeeder();
 }
 
 main();
