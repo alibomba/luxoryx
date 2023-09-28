@@ -1,5 +1,5 @@
-import {useState, useEffect, useContext} from 'react';
-import { ContextType, AuthContext} from '../../contexts/AuthProvider';
+import { useState, useEffect, useContext } from 'react';
+import { ContextType, AuthContext } from '../../contexts/AuthProvider';
 import { Navigate } from 'react-router-dom';
 
 import styles from './checkout.module.css';
@@ -7,7 +7,7 @@ import Error from '../../components/error/Error';
 import axiosClient from '../../axiosClient';
 
 const Checkout = () => {
-    const {cart, setContextCart} = useContext<ContextType>(AuthContext);
+    const { cart, setContextCart } = useContext<ContextType>(AuthContext);
     const [validationError, setValidationError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ const Checkout = () => {
     // }, []);
 
 
-    async function submit(e: React.FormEvent){
+    async function submit(e: React.FormEvent) {
         e.preventDefault();
         const form = e.target as HTMLFormElement;
         const city = form.querySelector('#city') as HTMLInputElement;
@@ -28,25 +28,50 @@ const Checkout = () => {
         const checkedShipping = form.querySelector('[name="shipping"]:checked') as HTMLInputElement;
         const couponCode = form.querySelector('#couponCode') as HTMLInputElement;
 
-        if(!checkedShipping){
+        if (!checkedShipping) {
             return setValidationError('Wybierz sposób dostawy');
         }
-        if(couponCode.value){
-            try{
+        const shippingMethod = checkedShipping.closest('div')?.querySelector('label')?.innerText;
+
+        if (couponCode.value) {
+            try {
                 const res = await axiosClient({
                     method: 'get',
                     url: `/is-coupon-code-valid?code=${couponCode.value}`
                 });
-                if(!res.data.valid){
+                if (!res.data.valid) {
                     return setValidationError('Niepoprawny kod zniżkowy');
                 }
-            }catch(err){
+            } catch (err) {
                 return setError('Coś poszło nie tak, spróbuj ponownie później...');
+            }
+        }
+        try {
+            const res = await axiosClient({
+                method: 'post',
+                url: '/initiate-an-order',
+                data: {
+                    city: city.value,
+                    address: address.value,
+                    email: email.value,
+                    phoneNumber: phoneNumber.value,
+                    shippingMethod,
+                    products: JSON.stringify(cart),
+                    couponCode: couponCode.value ? couponCode.value : undefined
+                }
+            });
+            window.location.href = res.data.url;
+        }
+        catch (err: any) {
+            if (err?.response?.status === 422) {
+                setValidationError(err?.response?.data?.message);
+            } else {
+                setError('Coś poszło nie tak, spróbuj ponownie później...');
             }
         }
     }
 
-    if(error){
+    if (error) {
         return <Error>{error}</Error>
     }
 
@@ -83,33 +108,33 @@ const Checkout = () => {
                     <h2 className={styles.section__heading}>Sposób dostawy</h2>
                     <div className={styles.section__shippingField}>
                         <div className={styles.section__shippingField__top}>
-                        <input className={styles.section__radio} type="radio" name="shipping" id='inpost' />
-                        <label htmlFor="inpost" className={styles.section__label}>Paczkomat InPost</label>
-                        <p className={styles.section__price}>9.99zł</p>
+                            <input className={styles.section__radio} type="radio" name="shipping" id='inpost' />
+                            <label htmlFor="inpost" className={styles.section__label}>Paczkomat InPost</label>
+                            <p className={styles.section__price}>9.99zł</p>
                         </div>
                         <p className={styles.section__expectedDate}>wt. 5 wrz.</p>
                     </div>
                     <div className={styles.section__shippingField}>
                         <div className={styles.section__shippingField__top}>
-                        <input className={styles.section__radio} type="radio" name="shipping" id='dpd' />
-                        <label htmlFor="dpd" className={styles.section__label}>Kurier DPD</label>
-                        <p className={styles.section__price}>19.99zł</p>
+                            <input className={styles.section__radio} type="radio" name="shipping" id='dpd' />
+                            <label htmlFor="dpd" className={styles.section__label}>Kurier DPD</label>
+                            <p className={styles.section__price}>19.99zł</p>
                         </div>
                         <p className={styles.section__expectedDate}>wt. 5 wrz.</p>
                     </div>
                     <div className={styles.section__shippingField}>
                         <div className={styles.section__shippingField__top}>
-                        <input className={styles.section__radio} type="radio" name="shipping" id='dhl' />
-                        <label htmlFor="dhl" className={styles.section__label}>Kurier DHL</label>
-                        <p className={styles.section__price}>21.99zł</p>
+                            <input className={styles.section__radio} type="radio" name="shipping" id='dhl' />
+                            <label htmlFor="dhl" className={styles.section__label}>Kurier DHL</label>
+                            <p className={styles.section__price}>21.99zł</p>
                         </div>
                         <p className={styles.section__expectedDate}>wt. 5 wrz.</p>
                     </div>
                     <div className={styles.section__shippingField}>
                         <div className={styles.section__shippingField__top}>
-                        <input className={styles.section__radio} type="radio" name="shipping" id='pocztaPolska' />
-                        <label htmlFor="pocztaPolska" className={styles.section__label}>Poczta Polska</label>
-                        <p className={styles.section__price}>15.99zł</p>
+                            <input className={styles.section__radio} type="radio" name="shipping" id='pocztaPolska' />
+                            <label htmlFor="pocztaPolska" className={styles.section__label}>Poczta Polska</label>
+                            <p className={styles.section__price}>15.99zł</p>
                         </div>
                         <p className={styles.section__expectedDate}>wt. 5 wrz.</p>
                     </div>

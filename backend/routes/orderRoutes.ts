@@ -2,6 +2,10 @@ import { Request, Response, Router } from 'express';
 import { Order, PrismaClient } from '@prisma/client';
 import jwtAuthentication from '../middleware/jwtAuthentication';
 import { ClientProduct, PaginationResponse } from '../types';
+import complementaryPercentage from '../utilities/complementaryPercentage';
+import Stripe from 'stripe';
+import optionalOrderJwt from '../middleware/optionalOrderJwt';
+const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY as string, { apiVersion: '2023-08-16' });
 const orderRoutes: Router = Router();
 const prisma = new PrismaClient();
 
@@ -51,41 +55,136 @@ orderRoutes.post('/report-order', jwtAuthentication, async (req: Request, res: R
 });
 
 orderRoutes.get('/is-coupon-code-valid', async (req: Request, res: Response) => {
-    const {code} = req.query;
-    if(!code) return res.status(422).json({message: 'Kod jest wymagany'});
-    if(await prisma.discountCoupon.findUnique({where: {code: code as string, is_valid: true}})){
-        res.json({valid: true});
+    const { code } = req.query;
+    if (!code) return res.status(422).json({ message: 'Kod jest wymagany' });
+    if (await prisma.discountCoupon.findUnique({ where: { code: code as string, is_valid: true } })) {
+        res.json({ valid: true });
     }
-    else{
-        res.json({valid: false});
+    else {
+        res.json({ valid: false });
     }
 });
 
-orderRoutes.post('/initiate-an-order', async(req: Request, res: Response) => {
-    const {city, address, email, phoneNumber, shippingMethod, products, couponCode} = req.body;
-    if(!city) return res.status(422).json({message: 'Miasto jest wymagane'});
-    if(!address) return res.status(422).json({message: 'Adres jest wymagany'});
-    if(!email) return res.status(422).json({message: 'Adres e-mail jest wymagany'});
+orderRoutes.post('/initiate-an-order', optionalOrderJwt, async (req: Request, res: Response) => {
+    const { city, address, email, phoneNumber, shippingMethod, products, couponCode, user } = req.body;
+    if (!city) return res.status(422).json({ message: 'Miasto jest wymagane' });
+    if (!address) return res.status(422).json({ message: 'Adres jest wymagany' });
+    if (!email) return res.status(422).json({ message: 'Adres e-mail jest wymagany' });
     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (!emailRegex.test(email)) return res.status(422).json({ message: 'Podaj poprawny adres e-mail' });
-    if(!phoneNumber) return res.status(422).json({message: 'Numer telefonu jest wymagany'});
-    if(!shippingMethod) return res.status(422).json({message: 'Wyierz sposób dostawy'});
-    if(!products) return res.status(422).json({message: 'Produkty są wymagane'});
-    if(!Array.isArray(JSON.parse(products))) return res.status(422).json({message: 'Nieprawidłowy format produktów'});
-    const discountCoupon = await prisma.discountCoupon.findUnique({where: {code: couponCode as string, is_valid: true}}) 
-    if(!discountCoupon) return res.status(422).json({message: 'Niepoprawny kod zniżkowy'});
+    if (!phoneNumber) return res.status(422).json({ message: 'Numer telefonu jest wymagany' });
+    if (!shippingMethod) return res.status(422).json({ message: 'Wyierz sposób dostawy' });
+    let shippingPrice = 0;
+    switch (shippingMethod) {
+        case 'Paczkomat InPost':
+            shippingPrice = 9.99;
+            break;
+        case 'Kurier DPD':
+            shippingPrice = 19.99;
+            break;
+        case 'Kurier DHL':
+            shippingPrice = 21.99;
+            break;
+        case 'Poczta Polska':
+            shippingPrice = 15.99;
+            break;
+    }
+    if (!products) return res.status(422).json({ message: 'Produkty są wymagane' });
+    if (!Array.isArray(JSON.parse(products))) return res.status(422).json({ message: 'Nieprawidłowy format produktów' });
+    if (couponCode) {
+        var discountCoupon = await prisma.discountCoupon.findUnique({ where: { code: couponCode as string, is_valid: true } })
+        if (!discountCoupon) return res.status(422).json({ message: 'Niepoprawny kod zniżkowy' });
+    }
+    const orderGroup = await prisma.orderGroup.create({
+        data: {
+            city,
+            address,
+            email,
+            phone_number: phoneNumber,
+            shippingMethod,
+            status: 'Oczekiwanie na płatność'
+        }
+    });
     const productsArr: ClientProduct[] = JSON.parse(products);
-    // productsArr.forEach(async(product) => {
-    //     try{
-    //         await prisma.order.create({
-    //             data: {
+    const line_items = await Promise.all(
+        productsArr.map(async (product) => {
+            const currentProduct = await prisma.product.findUnique({ where: { id: product.id }, include: { images: { where: { is_thumbnail: true } } } });
+            if (!currentProduct) return {};
+            await prisma.order.create({
+                data: {
+                    user_id: user ? user.id : undefined,
+                    product_id: currentProduct.id,
+                    sold_at_price: currentProduct.price,
+                    quantity: product.quantity,
+                    orderGroup_id: orderGroup.id
+                }
+            });
+            return {
+                price_data: {
+                    currency: 'pln',
+                    product_data: {
+                        name: currentProduct.name,
+                        images: [`${process.env.BACKEND_URL}/storage/offers/${currentProduct.images[0].url}`]
+                    },
+                    unit_amount: Math.round((couponCode && discountCoupon) ? complementaryPercentage(currentProduct.price * 100, discountCoupon.percentage) : currentProduct.price * 100)
+                },
+                quantity: product.quantity
+            }
+        }));
+    line_items.push({
+        price_data: {
+            currency: 'pln',
+            product_data: {
+                name: shippingMethod,
+                images: []
+            },
+            unit_amount: parseInt((shippingPrice * 100).toFixed(2))
+        },
+        quantity: 1
+    });
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card', 'paypal', 'blik', 'p24'],
+            line_items,
+            mode: 'payment',
+            success_url: `${process.env.FRONTEND_URL}/success`,
+            cancel_url: `${process.env.FRONTEND_URL}/koszyk`,
+            metadata: {
+                orderGroupId: orderGroup.id
+            }
+        });
+        res.json({ url: session.url });
+    } catch (err: any) {
+        res.json({ err });
+    }
+});
 
-    //             }
-    //         })
-    //     }catch(err){
-    //         return res.sendStatus(500);
-    //     }
-    // });
+orderRoutes.post('/webhooks', async (req: Request, res: Response) => {
+    const event = req.body;
+    if (event.type === 'checkout.session.completed') {
+        const orderGroupId = event.data.object.metadata.orderGroupId;
+        const orderGroup = await prisma.orderGroup.findUnique({ where: { id: orderGroupId }, include: { orders: true } });
+        if (!orderGroup) return res.sendStatus(400);
+        await prisma.orderGroup.update({
+            where: {
+                id: orderGroupId
+            },
+            data: {
+                status: 'Opłacono'
+            }
+        });
+        orderGroup.orders.forEach(async (order) => {
+            await prisma.order.update({
+                where: {
+                    id: order.id
+                },
+                data: {
+                    paid: true
+                }
+            });
+        });
+    }
+    res.json({ received: true });
 });
 
 export default orderRoutes;

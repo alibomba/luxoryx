@@ -147,10 +147,10 @@ model OrderReport {
 
 model Order {
   id            String         @id @default(uuid())
-  orderGroup_id String 
-  orderGroup OrderGroup @relation(fields: [orderGroup_id], references: [id], onDelete: Cascade)
-  user_id       String
-  user          User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  orderGroup_id String
+  orderGroup    OrderGroup     @relation(fields: [orderGroup_id], references: [id], onDelete: Cascade)
+  user_id       String?
+  user          User?          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   report        OrderReport?
   product_id    String
   product       Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -158,18 +158,18 @@ model Order {
   quantity      Int
   bought_at     DateTime       @default(now())
   ReturnRequest ReturnRequest?
-  paid Boolean @default(false)
+  paid          Boolean        @default(false)
 }
 
-model OrderGroup{
-  id String @id @default(uuid())
-  orders Order[]
-  city String
-  address String
-  email String
-  phone_number String
+model OrderGroup {
+  id             String  @id @default(uuid())
+  orders         Order[]
+  city           String
+  address        String
+  email          String
+  phone_number   String
   shippingMethod String
-  status        String
+  status         String
 }
 
 model ReturnRequest {
