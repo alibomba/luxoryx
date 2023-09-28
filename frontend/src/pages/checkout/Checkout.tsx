@@ -11,11 +11,11 @@ const Checkout = () => {
     const [validationError, setValidationError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // useEffect(() => {      
-    //     return () => {
-    //         setContextCart([]);
-    //     }
-    // }, []);
+    useEffect(() => {
+        return () => {
+            setContextCart([]);
+        }
+    }, []);
 
 
     async function submit(e: React.FormEvent) {
@@ -75,9 +75,9 @@ const Checkout = () => {
         return <Error>{error}</Error>
     }
 
-    // if(cart.length === 0){
-    //     return <Navigate to='/' />
-    // }
+    if (cart.length === 0) {
+        return <Navigate to='/' />
+    }
 
     return (
         <main className={styles.main}>
