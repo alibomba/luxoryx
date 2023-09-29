@@ -33,7 +33,7 @@ const KontoMyOrders = ({ setError }: Props) => {
         setOrders(res.data);
       })
       .catch(err => {
-        if (err?.response?.status === 404 && err?.response?.data?.message === 'Brak wyników') {
+        if (err?.response?.status === 404 && err?.response?.data?.message === 'Brak zamówień') {
           setNoResults(true);
         }
         else {

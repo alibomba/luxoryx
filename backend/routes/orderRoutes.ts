@@ -187,4 +187,18 @@ orderRoutes.post('/webhooks', async (req: Request, res: Response) => {
     res.json({ received: true });
 });
 
+orderRoutes.get('/shipping-data', jwtAuthentication, async (req: Request, res: Response) => {
+    const {user} = req.body;
+
+    const userWithShipping = await prisma.user.findUnique({where: {id: user.id}, include: {shipping: true}});
+    if(!userWithShipping) return res.status(404).json({message: 'Użytkownik nie istnieje'});
+
+    res.json({
+        city: userWithShipping.shipping?.city || '',
+        address: userWithShipping.shipping?.address || '',
+        email: userWithShipping.email,
+        phoneNumber: userWithShipping.phone_number
+    });
+});
+
 export default orderRoutes;

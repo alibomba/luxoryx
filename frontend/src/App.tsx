@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './contexts/AuthProvider';
 import DefaultLayout from "./layouts/DefaultLayout";
-import { About, Cart, Checkout, Contact, Home, Konto, Login, NotFound, Product, Register, ReturnPage, Sklep, Wyszukiwarka } from "./pages";
+import { About, Cart, Checkout, Contact, Home, Konto, Login, NotFound, Product, Register, ReturnPage, Sklep, Wyszukiwarka, Success } from "./pages";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/success" element={<Success />} />
           <Route path="/logowanie" element={<Login />} />
           <Route path="/rejestracja" element={<Register />} />
           <Route path="*" element={<NotFound />} />

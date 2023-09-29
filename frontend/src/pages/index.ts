@@ -11,3 +11,4 @@ export { default as Register } from './register/Register';
 export { default as ReturnPage } from './returnPage/ReturnPage';
 export { default as Sklep } from './sklep/Sklep';
 export { default as Wyszukiwarka } from './wyszukiwarka/Wyszukiwarka';
+export {default as Success} from './success/Success';

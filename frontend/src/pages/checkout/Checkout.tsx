@@ -1,17 +1,45 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { ContextType, AuthContext } from '../../contexts/AuthProvider';
 import { Navigate } from 'react-router-dom';
 
 import styles from './checkout.module.css';
 import Error from '../../components/error/Error';
+import Loading from '../../components/loading/Loading';
 import axiosClient from '../../axiosClient';
+import axios from 'axios';
 
 const Checkout = () => {
-    const { cart, setContextCart } = useContext<ContextType>(AuthContext);
+    const { isAuthorized, isLoading, cart, setContextCart } = useContext<ContextType>(AuthContext);
     const [validationError, setValidationError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const cityRef = useRef<HTMLInputElement>(null);
+    const addressRef = useRef<HTMLInputElement>(null);
+    const emailRef = useRef<HTMLInputElement>(null);
+    const phoneNumberRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        if(isAuthorized){
+            const source = axios.CancelToken.source();
+            axiosClient({
+                method: 'get',
+                url: '/shipping-data',
+                cancelToken: source.token
+            })
+            .then(res => {
+                const data = res.data;
+                cityRef.current!.value = data.city;
+                addressRef.current!.value = data.address;
+                emailRef.current!.value = data.email;
+                phoneNumberRef.current!.value = data.phoneNumber;
+            })
+            .catch(err => setError('Coś poszło nie tak, spróbuj ponownie później...'));
+        
+            return () => {
+                source.cancel();
+                setContextCart([]);
+            }
+        }
+
         return () => {
             setContextCart([]);
         }
@@ -71,6 +99,10 @@ const Checkout = () => {
         }
     }
 
+    if(isLoading){
+        return <Loading />
+    }
+
     if (error) {
         return <Error>{error}</Error>
     }
@@ -88,19 +120,19 @@ const Checkout = () => {
                     <div className={styles.section__grid}>
                         <div className={styles.section__field}>
                             <label className={styles.section__label} htmlFor="city">Miasto</label>
-                            <input max={100} required id='city' type="text" className={styles.section__input} />
+                            <input ref={cityRef} max={100} required id='city' type="text" className={styles.section__input} />
                         </div>
                         <div className={styles.section__field}>
                             <label className={styles.section__label} htmlFor="address">Adres</label>
-                            <input max={100} required id='address' type="text" className={styles.section__input} />
+                            <input ref={addressRef} max={100} required id='address' type="text" className={styles.section__input} />
                         </div>
                         <div className={styles.section__field}>
                             <label className={styles.section__label} htmlFor="email">E-mail</label>
-                            <input max={100} required id='email' type="email" className={styles.section__input} />
+                            <input ref={emailRef} max={100} required id='email' type="email" className={styles.section__input} />
                         </div>
                         <div className={styles.section__field}>
                             <label className={styles.section__label} htmlFor="phoneNumber">Numeru telefonu</label>
-                            <input max={100} required id='phoneNumber' type="text" className={styles.section__input} />
+                            <input ref={phoneNumberRef} max={100} required id='phoneNumber' type="text" className={styles.section__input} />
                         </div>
                     </div>
                 </section>
