@@ -101,9 +101,18 @@ model Review {
   content    String
   likes      Int
   dislikes   Int
+  reports ReviewReport[]
   created_at DateTime @default(now())
   product_id String
   product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model ReviewReport {
+  id String @id @default(uuid())
+  review Review @relation(fields: [review_id], references: [id], onDelete: Cascade)
+  review_id String
+  processed Boolean @default(false)
+  sent_at DateTime @default(now())
 }
 
 model ProductLike {

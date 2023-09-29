@@ -172,4 +172,21 @@ productRoutes.get('/my-favorites', jwtAuthentication, async (req: Request, res: 
     res.json(response);
 });
 
+productRoutes.get('/product/:id', async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const product = await prisma.product.findUnique({
+        where: {id},
+        include: {
+            images: true,
+            category: true,
+            variants: true,
+            discount: true,
+            parameters: true,
+            reviews: true
+        }
+    });
+    if(!product) return res.status(404).json({message: 'Produkt nie istnieje'});
+    res.json(product);
+})
+
 export default productRoutes;
