@@ -153,7 +153,7 @@ orderRoutes.post('/initiate-an-order', optionalOrderJwt, async (req: Request, re
                 orderGroupId: orderGroup.id
             }
         });
-        res.json({ url: session.url });
+        return res.json({ url: session.url });
     } catch (err: any) {
         res.json({ err });
     }
@@ -188,10 +188,10 @@ orderRoutes.post('/webhooks', async (req: Request, res: Response) => {
 });
 
 orderRoutes.get('/shipping-data', jwtAuthentication, async (req: Request, res: Response) => {
-    const {user} = req.body;
+    const { user } = req.body;
 
-    const userWithShipping = await prisma.user.findUnique({where: {id: user.id}, include: {shipping: true}});
-    if(!userWithShipping) return res.status(404).json({message: 'Użytkownik nie istnieje'});
+    const userWithShipping = await prisma.user.findUnique({ where: { id: user.id }, include: { shipping: true } });
+    if (!userWithShipping) return res.status(404).json({ message: 'Użytkownik nie istnieje' });
 
     res.json({
         city: userWithShipping.shipping?.city || '',

@@ -173,9 +173,9 @@ productRoutes.get('/my-favorites', jwtAuthentication, async (req: Request, res: 
 });
 
 productRoutes.get('/product/:id', async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const product = await prisma.product.findUnique({
-        where: {id},
+        where: { id },
         include: {
             images: true,
             category: true,
@@ -185,8 +185,21 @@ productRoutes.get('/product/:id', async (req: Request, res: Response) => {
             reviews: true
         }
     });
-    if(!product) return res.status(404).json({message: 'Produkt nie istnieje'});
+    if (!product) return res.status(404).json({ message: 'Produkt nie istnieje' });
     res.json(product);
-})
+});
+
+productRoutes.get('/cross-sell/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) return res.status(400).json({ message: 'Produkt nie istnieje' });
+    const products = await prisma.product.findMany({
+        where: { category_id: product.category_id },
+        include: { discount: true, images: { where: { is_thumbnail: true } } },
+        take: 3
+    });
+    if (products.length < 3) return res.status(404).json({ message: 'Za mało wyników' });
+    res.json(products);
+});
 
 export default productRoutes;

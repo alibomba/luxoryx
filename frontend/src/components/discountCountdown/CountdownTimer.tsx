@@ -4,6 +4,7 @@ import styles from './countdownTimer.module.css';
 
 interface CountdownTimerProps {
     targetDate: string;
+    className?: string;
 }
 
 interface TimeRemaining {
@@ -13,7 +14,7 @@ interface TimeRemaining {
     seconds: number;
 }
 
-function CountdownTimer({ targetDate }: CountdownTimerProps): JSX.Element {
+function CountdownTimer({ targetDate, className }: CountdownTimerProps): JSX.Element {
     const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
         days: 0,
         hours: 0,
@@ -51,7 +52,7 @@ function CountdownTimer({ targetDate }: CountdownTimerProps): JSX.Element {
     return (
         <>
             {
-                !countdownFinished ? <p className={styles.discountTimer}>{`${days}:${hours}:${minutes}:${seconds}`}</p> : ''
+                !countdownFinished ? <p className={`${styles.discountTimer} ${className}`}>{`${days}:${hours}:${minutes}:${seconds}`}</p> : ''
             }
         </>
     );

@@ -4,6 +4,7 @@
     flex-direction: column;
     align-items: center;
     padding-left: 6em;
+    min-height: 50em;
 }
 
 .main__heading {

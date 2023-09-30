@@ -94,25 +94,25 @@ model Image {
 }
 
 model Review {
-  id         String   @id @default(uuid())
+  id         String         @id @default(uuid())
   user_id    String
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   rate       Int
   content    String
-  likes      Int
-  dislikes   Int
-  reports ReviewReport[]
-  created_at DateTime @default(now())
+  likes      Int            @default(0)
+  dislikes   Int            @default(0)
+  reports    ReviewReport[]
+  created_at DateTime       @default(now()) @db.Timestamptz()
   product_id String
-  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model ReviewReport {
-  id String @id @default(uuid())
-  review Review @relation(fields: [review_id], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  review    Review   @relation(fields: [review_id], references: [id], onDelete: Cascade)
   review_id String
-  processed Boolean @default(false)
-  sent_at DateTime @default(now())
+  processed Boolean  @default(false)
+  sent_at   DateTime @default(now())
 }
 
 model ProductLike {

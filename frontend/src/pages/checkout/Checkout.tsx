@@ -18,22 +18,22 @@ const Checkout = () => {
     const phoneNumberRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if(isAuthorized){
+        if (isAuthorized) {
             const source = axios.CancelToken.source();
             axiosClient({
                 method: 'get',
                 url: '/shipping-data',
                 cancelToken: source.token
             })
-            .then(res => {
-                const data = res.data;
-                cityRef.current!.value = data.city;
-                addressRef.current!.value = data.address;
-                emailRef.current!.value = data.email;
-                phoneNumberRef.current!.value = data.phoneNumber;
-            })
-            .catch(err => setError('Coś poszło nie tak, spróbuj ponownie później...'));
-        
+                .then(res => {
+                    const data = res.data;
+                    cityRef.current!.value = data.city;
+                    addressRef.current!.value = data.address;
+                    emailRef.current!.value = data.email;
+                    phoneNumberRef.current!.value = data.phoneNumber;
+                })
+                .catch(err => setError('Coś poszło nie tak, spróbuj ponownie później...'));
+
             return () => {
                 source.cancel();
                 setContextCart([]);
@@ -86,6 +86,9 @@ const Checkout = () => {
                     shippingMethod,
                     products: JSON.stringify(cart),
                     couponCode: couponCode.value ? couponCode.value : undefined
+                },
+                headers: {
+                    RefreshToken: isAuthorized ? (localStorage.getItem('refreshToken') || '') : undefined
                 }
             });
             window.location.href = res.data.url;
@@ -99,7 +102,7 @@ const Checkout = () => {
         }
     }
 
-    if(isLoading){
+    if (isLoading) {
         return <Loading />
     }
 
