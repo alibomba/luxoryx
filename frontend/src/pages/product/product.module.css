@@ -44,6 +44,10 @@
     cursor: pointer;
 }
 
+.header__image_active {
+    border: 5px solid var(--primary);
+}
+
 .header__right {
     display: flex;
     flex-direction: column;

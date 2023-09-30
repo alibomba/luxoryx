@@ -155,7 +155,7 @@ orderRoutes.post('/initiate-an-order', optionalOrderJwt, async (req: Request, re
         });
         return res.json({ url: session.url });
     } catch (err: any) {
-        res.json({ err });
+        return res.json({ err });
     }
 });
 

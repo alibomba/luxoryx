@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { ContextType, AuthContext } from '../../contexts/AuthProvider';
-import { AiFillHeart, AiOutlineHeart, AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike, AiFillCaretDown, AiOutlineSortDescending } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineHeart, AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike, AiFillCaretDown, AiOutlineSortDescending, AiOutlineDelete } from 'react-icons/ai';
 import { BsShareFill, BsFlag } from 'react-icons/bs';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -34,6 +34,7 @@ const Product = () => {
     const [reviewsShown, setReviewsShown] = useState<number>(3);
     const [reviewsAllShown, setReviewsAllShown] = useState<boolean>(true);
     const [selectedRate, setSelectedRate] = useState<number>(3);
+    const [currentImage, setCurrentImage] = useState<number>(0);
     const [isProductLoading, setIsProductLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [popup, setPopup] = useState<Popup>({ content: '', active: false, type: 'good' });
@@ -122,7 +123,7 @@ const Product = () => {
             source.cancel();
         }
 
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         async function fetchData() {
@@ -310,6 +311,109 @@ const Product = () => {
         }
     }
 
+    async function toggleReviewLike(reviewId: string): Promise<void> {
+        try {
+            const res = await axiosClient({
+                method: 'post',
+                url: `/toggle-review-like/${reviewId}`
+            });
+            setPopup({ content: res.data.message, active: true, type: 'good' });
+            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+            setReviews(prev => {
+                const newValue = prev.map(review => {
+                    if (review.id === reviewId) {
+                        if (res.status === 200) {
+                            return { ...review, isLiked: false, likes: review.likes - 1 };
+                        } else if (res.status === 201) {
+                            if (review.isDisliked) {
+                                return { ...review, isLiked: true, isDisliked: false, likes: review.likes + 1, dislikes: review.dislikes - 1 };
+                            } else {
+                                return { ...review, isLiked: true, likes: review.likes + 1 };
+                            }
+                        }
+                        else {
+                            return review;
+                        }
+                    }
+                    else {
+                        return review;
+                    }
+                });
+                return newValue;
+            });
+        } catch (err) {
+            setError('Coś poszło nie tak, spróbuj ponownie później...');
+        }
+    }
+
+    async function toggleReviewDislike(reviewId: string): Promise<void> {
+        try {
+            const res = await axiosClient({
+                method: 'post',
+                url: `/toggle-review-dislike/${reviewId}`
+            });
+            setPopup({ content: res.data.message, active: true, type: 'good' });
+            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+            setReviews(prev => {
+                const newValue = prev.map(review => {
+                    if (review.id === reviewId) {
+                        if (res.status === 200) {
+                            return { ...review, isDisliked: false, dislikes: review.dislikes - 1 };
+                        } else if (res.status === 201) {
+                            if (review.isLiked) {
+                                return { ...review, isDisliked: true, isLiked: false, dislikes: review.dislikes + 1, likes: review.likes - 1 };
+                            } else {
+                                return { ...review, isDisliked: true, dislikes: review.dislikes + 1 };
+                            }
+                        }
+                        else {
+                            return review;
+                        }
+                    }
+                    else {
+                        return review;
+                    }
+                });
+                return newValue;
+            });
+        } catch (err) {
+            setError('Coś poszło nie tak, spróbuj ponownie później...');
+        }
+    }
+
+    async function reportReview(reviewId: string): Promise<void> {
+        try {
+            const res = await axiosClient({
+                method: 'post',
+                url: `/report-review/${reviewId}`
+            });
+            setPopup({ content: res.data.message, active: true, type: 'good' });
+            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+        } catch (err) {
+            setError('Coś poszło nie tak, spróbuj ponownie później...');
+        }
+    }
+
+    async function deleteReview(reviewId: string): Promise<void> {
+        const confirmation = window.confirm('Na pewno chcesz usunąć recenzję? Nie da się tego cofnąć!');
+        if (confirmation) {
+            try {
+                const res = await axiosClient({
+                    method: 'delete',
+                    url: `/delete-review/${reviewId}`
+                });
+                setPopup({ content: 'Usunięto recenzję', active: true, type: 'good' });
+                setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+                setReviews(prev => {
+                    const newValue = prev.filter(review => review.id !== reviewId);
+                    return newValue;
+                })
+            } catch (err) {
+                setError('Coś poszło nie tak, spróbuj ponownie później...');
+            }
+        }
+    }
+
     if (isProductLoading || isLoading) {
         return <Loading />
     }
@@ -324,13 +428,13 @@ const Product = () => {
                 <main className={styles.main}>
                     <header className={styles.header}>
                         <div className={styles.header__left}>
-                            <img className={styles.header__thumbnail} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="miniatura oferty" />
+                            <img className={styles.header__thumbnail} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/${product.images[currentImage].url}`} alt="miniatura oferty" />
                             <div className={styles.header__images}>
-                                <img className={styles.header__image} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="zdjęcie produktu" />
-                                <img className={styles.header__image} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="zdjęcie produktu" />
-                                <img className={styles.header__image} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="zdjęcie produktu" />
-                                <img className={styles.header__image} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="zdjęcie produktu" />
-                                <img className={styles.header__image} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/1.jpg`} alt="zdjęcie produktu" />
+                                {
+                                    product.images.map((image, index) => {
+                                        return <img onClick={() => setCurrentImage(index)} key={image.id} className={`${styles.header__image} ${currentImage === index && styles.header__image_active}`} src={`${process.env.REACT_APP_BACKEND_URL}/storage/offers/${image.url}`} alt="zdjęcie produktu" />
+                                    })
+                                }
                             </div>
                         </div>
                         <div className={styles.header__right}>
@@ -465,21 +569,27 @@ const Product = () => {
                                                         <div className={styles.review__bottom}>
                                                             <div className={styles.review__bottom__left}>
                                                                 <div className={styles.review__likeContainer}>
-                                                                    <button className={`${styles.review__likeContainer__button} ${styles.review__likeContainer__button_like}`}>
-                                                                        <AiOutlineLike />
+                                                                    <button onClick={() => toggleReviewLike(review.id)} className={`${styles.review__likeContainer__button} ${styles.review__likeContainer__button_like}`}>
+                                                                        {review.isLiked ? <AiFillLike /> : <AiOutlineLike />}
                                                                     </button>
                                                                     <p className={styles.review__likeCount}>{review.likes}</p>
                                                                 </div>
                                                                 <div className={styles.review__likeContainer}>
-                                                                    <button className={`${styles.review__likeContainer__button} ${styles.review__likeContainer__button_dislike}`}>
-                                                                        <AiOutlineLike />
+                                                                    <button onClick={() => toggleReviewDislike(review.id)} className={`${styles.review__likeContainer__button} ${styles.review__likeContainer__button_dislike}`}>
+                                                                        {review.isDisliked ? <AiFillDislike /> : <AiOutlineDislike />}
                                                                     </button>
                                                                     <p className={styles.review__likeCount}>{review.dislikes}</p>
                                                                 </div>
-                                                                <button className={styles.review__reportButton}>
+                                                                <button onClick={() => reportReview(review.id)} className={styles.review__reportButton}>
                                                                     <BsFlag />
                                                                 </button>
                                                             </div>
+                                                            {
+                                                                review.isMine &&
+                                                                <button onClick={() => deleteReview(review.id)} className={`${styles.review__authorButton} ${styles.review__authorButton_delete}`}>
+                                                                    <AiOutlineDelete />
+                                                                </button>
+                                                            }
                                                         </div>
                                                     </article>
                                                 )

@@ -7,6 +7,7 @@ import variantSeeder from "./variantSeeder";
 import discountSeeder from "./discountSeeder";
 import orderSeeder from "./orderSeeder";
 import couponCodeSeeder from "./couponCodeSeeder";
+import reviewSeeder from "./reviewSeeder";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -25,10 +26,14 @@ async function truncate() {
     await prisma.contactMessage.deleteMany();
     await prisma.orderReport.deleteMany();
     await prisma.order.deleteMany();
+    await prisma.orderGroup.deleteMany();
     await prisma.returnRequest.deleteMany();
     await prisma.discountCoupon.deleteMany();
     await prisma.cartElement.deleteMany();
     await prisma.newsletterMember.deleteMany();
+    await prisma.reviewReport.deleteMany();
+    await prisma.reviewLike.deleteMany();
+    await prisma.reviewDislike.deleteMany();
 }
 
 async function main() {
@@ -42,6 +47,7 @@ async function main() {
     await discountSeeder();
     await orderSeeder();
     await couponCodeSeeder();
+    await reviewSeeder();
 }
 
 main();

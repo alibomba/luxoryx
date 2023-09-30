@@ -11,5 +11,8 @@ type Review = {
         id: string,
         username: string,
         profile_picture: string | null
-    }
+    },
+    isMine: boolean,
+    isLiked: boolean,
+    isDisliked: boolean
 }
