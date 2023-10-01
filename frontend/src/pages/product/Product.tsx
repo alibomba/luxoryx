@@ -398,7 +398,7 @@ const Product = () => {
         const confirmation = window.confirm('Na pewno chcesz usunąć recenzję? Nie da się tego cofnąć!');
         if (confirmation) {
             try {
-                const res = await axiosClient({
+                await axiosClient({
                     method: 'delete',
                     url: `/delete-review/${reviewId}`
                 });
