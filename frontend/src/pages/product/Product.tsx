@@ -312,72 +312,83 @@ const Product = () => {
     }
 
     async function toggleReviewLike(reviewId: string): Promise<void> {
-        try {
-            const res = await axiosClient({
-                method: 'post',
-                url: `/toggle-review-like/${reviewId}`
-            });
-            setPopup({ content: res.data.message, active: true, type: 'good' });
-            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
-            setReviews(prev => {
-                const newValue = prev.map(review => {
-                    if (review.id === reviewId) {
-                        if (res.status === 200) {
-                            return { ...review, isLiked: false, likes: review.likes - 1 };
-                        } else if (res.status === 201) {
-                            if (review.isDisliked) {
-                                return { ...review, isLiked: true, isDisliked: false, likes: review.likes + 1, dislikes: review.dislikes - 1 };
-                            } else {
-                                return { ...review, isLiked: true, likes: review.likes + 1 };
+        if (isAuthorized) {
+            try {
+                const res = await axiosClient({
+                    method: 'post',
+                    url: `/toggle-review-like/${reviewId}`
+                });
+                setPopup({ content: res.data.message, active: true, type: 'good' });
+                setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+                setReviews(prev => {
+                    const newValue = prev.map(review => {
+                        if (review.id === reviewId) {
+                            if (res.status === 200) {
+                                return { ...review, isLiked: false, likes: review.likes - 1 };
+                            } else if (res.status === 201) {
+                                if (review.isDisliked) {
+                                    return { ...review, isLiked: true, isDisliked: false, likes: review.likes + 1, dislikes: review.dislikes - 1 };
+                                } else {
+                                    return { ...review, isLiked: true, likes: review.likes + 1 };
+                                }
+                            }
+                            else {
+                                return review;
                             }
                         }
                         else {
                             return review;
                         }
-                    }
-                    else {
-                        return review;
-                    }
+                    });
+                    return newValue;
                 });
-                return newValue;
-            });
-        } catch (err) {
-            setError('Coś poszło nie tak, spróbuj ponownie później...');
+            } catch (err) {
+                setError('Coś poszło nie tak, spróbuj ponownie później...');
+            }
+        } else {
+            setPopup({ content: 'Musisz być zalogowany', active: true, type: 'bad' });
+            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
         }
     }
 
     async function toggleReviewDislike(reviewId: string): Promise<void> {
-        try {
-            const res = await axiosClient({
-                method: 'post',
-                url: `/toggle-review-dislike/${reviewId}`
-            });
-            setPopup({ content: res.data.message, active: true, type: 'good' });
-            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
-            setReviews(prev => {
-                const newValue = prev.map(review => {
-                    if (review.id === reviewId) {
-                        if (res.status === 200) {
-                            return { ...review, isDisliked: false, dislikes: review.dislikes - 1 };
-                        } else if (res.status === 201) {
-                            if (review.isLiked) {
-                                return { ...review, isDisliked: true, isLiked: false, dislikes: review.dislikes + 1, likes: review.likes - 1 };
-                            } else {
-                                return { ...review, isDisliked: true, dislikes: review.dislikes + 1 };
+        if (isAuthorized) {
+            try {
+                const res = await axiosClient({
+                    method: 'post',
+                    url: `/toggle-review-dislike/${reviewId}`
+                });
+                setPopup({ content: res.data.message, active: true, type: 'good' });
+                setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
+                setReviews(prev => {
+                    const newValue = prev.map(review => {
+                        if (review.id === reviewId) {
+                            if (res.status === 200) {
+                                return { ...review, isDisliked: false, dislikes: review.dislikes - 1 };
+                            } else if (res.status === 201) {
+                                if (review.isLiked) {
+                                    return { ...review, isDisliked: true, isLiked: false, dislikes: review.dislikes + 1, likes: review.likes - 1 };
+                                } else {
+                                    return { ...review, isDisliked: true, dislikes: review.dislikes + 1 };
+                                }
+                            }
+                            else {
+                                return review;
                             }
                         }
                         else {
                             return review;
                         }
-                    }
-                    else {
-                        return review;
-                    }
+                    });
+                    return newValue;
                 });
-                return newValue;
-            });
-        } catch (err) {
-            setError('Coś poszło nie tak, spróbuj ponownie później...');
+            } catch (err) {
+                setError('Coś poszło nie tak, spróbuj ponownie później...');
+            }
+        }
+        else {
+            setPopup({ content: 'Musisz być zalogowany', active: true, type: 'bad' });
+            setTimeout(() => setPopup(prev => { return { ...prev, active: false } }), 4000);
         }
     }
 
