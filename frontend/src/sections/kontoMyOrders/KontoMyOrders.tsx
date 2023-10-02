@@ -112,7 +112,7 @@ const KontoMyOrders = ({ setError }: Props) => {
                 <div className={styles.order__data}>
                   <h3 className={styles.order__title}>{order.product.name}</h3>
                   <p className={styles.order__quantity}>{order.quantity}x{order.sold_at_price}zł</p>
-                  <p className={styles.order__price}>{order.quantity * order.sold_at_price}zł</p>
+                  <p className={styles.order__price}>{(order.quantity * order.sold_at_price).toFixed(2)}zł</p>
                 </div>
                 <button onClick={() => setReportedId(order.id)} className={styles.order__button}>
                   <AiFillWarning className={styles.order__icon} />
